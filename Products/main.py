@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Depends
-from .schemas import Products
-from . import models
-from .database import engine, SessionLocal
+from schemas import Products
+import models
+from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
 app = FastAPI()
 
+#Creates table based of models
 models.Base.metadata.create_all(engine)
 
 @app.get("/")
@@ -34,9 +35,3 @@ def add_data(request:Products, db:Session=Depends(get_db)):
     db.commit()
     db.refresh(new_product) 
     return new_product
-
-
-
-
-
-

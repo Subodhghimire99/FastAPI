@@ -1,6 +1,8 @@
-from .database import Base
+from database import Base
 from sqlalchemy import Column, Integer, String, Float, Boolean
 
+#ORM(Object Relational Mapping)
+#This maps the Products class fields with Products Table
 
 class Products(Base):
     __tablename__ = 'Products'
