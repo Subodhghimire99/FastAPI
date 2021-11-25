@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Depends
-from schemas import Products
-import models
-from database import engine, SessionLocal
+from fastapi import FastAPI, Depends, status, Response, HTTPException
+from .schemas import Products,Customers
+from . import models
+from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
 app = FastAPI()
@@ -9,9 +9,19 @@ app = FastAPI()
 #Creates table based of models
 models.Base.metadata.create_all(engine)
 
+
 @app.get("/")
 def index():
-    return("Working")
+    return(
+        {
+            'Message':'Welcome to the Products API',
+            'EndPoints': {
+                '/add':'For adding data (POST Request)',
+                '/products': 'For accessing all data (GET Request)',
+                '/products/{id}' : 'For accessing data with individual id (GET Request)' 
+                }    
+        }
+    )
 
 
 def get_db():
@@ -22,7 +32,7 @@ def get_db():
         db.close()
 
 
-@app.post("/add", status_code = 201)
+@app.post("/add", status_code = status.HTTP_201_CREATED)
 def add_data(request:Products, db:Session=Depends(get_db)):
     new_product = models.Products(
         name = request.name,
@@ -42,6 +52,11 @@ def get_data(db:Session = Depends(get_db)):
     return products
 
 @app.get("/products/{id}/")
-def get_individual(id, db:Session = Depends(get_db)):
+def get_individual(id,response:Response, db:Session = Depends(get_db)):
     product = db.query(models.Products).filter(models.Products.id == id).all()
+    if not product:
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return({"data":f"response with id {id} not found"})
+        #Alternatively
+        raise HTTPException(status_code=404, detail=f"not found with id {id}")
     return product

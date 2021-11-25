@@ -10,3 +10,9 @@ class Products(BaseModel):
     price:float
     description:str
     recommended:Optional[bool]
+
+class Customers(BaseModel):
+    name:str
+    age:int
+    country:str
+    frequent:bool
